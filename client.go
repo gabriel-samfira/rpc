@@ -13,7 +13,6 @@ import (
 	"net"
 	"net/http"
 	"sync"
-	"github.com/natefinch/npipe"
 )
 
 // ServerError represents an error that has been returned from
@@ -241,13 +240,7 @@ func DialHTTP(network, address string) (*Client, error) {
 // DialHTTPPath connects to an HTTP RPC server
 // at the specified network address and path.
 func DialHTTPPath(network, address, path string) (*Client, error) {
-	var err error
-	var conn net.Conn
-	if network == "pipe" {
-		conn, err = npipe.Dial(address)
-	} else {
-		conn, err = net.Dial(network, address)
-	}
+	conn, err := dialAddress(network, address)
 	if err != nil {
 		return nil, err
 	}
@@ -273,7 +266,7 @@ func DialHTTPPath(network, address, path string) (*Client, error) {
 
 // Dial connects to an RPC server at the specified network address.
 func Dial(network, address string) (*Client, error) {
-	conn, err := net.Dial(network, address)
+	conn, err := dialAddress(network, address)
 	if err != nil {
 		return nil, err
 	}
